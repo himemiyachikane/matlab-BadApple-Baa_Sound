@@ -1,4 +1,4 @@
-function [y,Fs]=midi2audio(input,Fs,synthtype)
+function [y,Fs]=midi2audio(input,Fs,synthtype,rail)
 % y = midi2audio(input, Fs, synthtype)
 % y = midi2audio(input, Fs)
 % y = midi2audio(input)
@@ -46,6 +46,9 @@ if (length(endtime)>1)
   endtime = max(endtime);
 end
 
+if (nargin==4)
+  Notes=Notes(Notes(:,1) == rail,:);
+end
 
 y = zeros(1,ceil(endtime*Fs));
 
@@ -56,7 +59,7 @@ for i=1:size(Notes,1)
   amp = Notes(i,4)/127;
 
   yt = synth(f, dur, amp, Fs, synthtype);
-
+ 
   n1 = floor(Notes(i,5)*Fs)+1;
   N = length(yt);  
 

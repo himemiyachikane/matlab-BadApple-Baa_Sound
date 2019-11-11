@@ -1,4 +1,5 @@
 function y=synth(freq,dur,amp,Fs,type)
+    global baa;
 % y=synth(freq,dur,amp,Fs,type)
 %
 % Synthesize a single note
@@ -33,8 +34,40 @@ end
 
 n=0:N-1;
 if (strcmp(type,'sine'))
-  y = amp.*sin(2*pi*n*freq/Fs);
+%       temp = ceil(N/length(baa));
+%       temp = repmat(baa,temp,1)';
+%       y=0.7*amp*temp( n+1) .* hanning(N)';
+if(freq<1600)
+    freq2 = 1600;
+elseif(freq<1800)
+    freq2 = freq;
+else
+    freq2 = 1800;
+end
+    resample_baa = interp1(baa,linspace(1,length(baa),length(baa) * freq2/1700));
+    temp = ceil(N/length(resample_baa));
+    temp = repmat(resample_baa,1,temp);
+    y=amp*temp( n+1) .* hanning(N)';
 
+    y = 0.9*y+0.1*amp.*sin(2*pi*n*freq/Fs);
+    
+%     
+%     if(freq>1500 && freq<2700)
+%         %   temp = ceil(N/length(baa));
+%         %   temp = repmat(baa,temp,1)';
+%         %  y=amp*temp( n+1) .* hanning(N)';
+%           resample_baa = interp1(baa,linspace(1,length(baa),length(baa) * freq/1700));
+%           temp = ceil(N/length(resample_baa));
+%           temp = repmat(resample_baa,1,temp);
+%           y=amp*temp( n+1) .* hanning(N)';
+%     else
+%         y = amp.*sin(2*pi*n*freq/Fs);
+%     end
+  %
+
+ 
+   assert(size(y,1)==1);
+%  
 elseif (strcmp(type,'saw'))
 
   T = (1/freq)*Fs;     % period in fractional samples
@@ -61,4 +94,5 @@ if (dur > .02)
   L = ceil(L/2);
   y(1:L) = y(1:L) .* ramp(1:L);
   y(end-L+1:end) = y(end-L+1:end) .* ramp(end-L+1:end);
+     assert(size(y,1)==1);
 end
